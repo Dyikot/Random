@@ -10,10 +10,10 @@ concept IntRange = std::ranges::range<IEnumerable> &&
 class Random
 {
 private:
+	std::random_device _device;
+	std::default_random_engine _engine;
+private:
 	Random();
-
-	std::random_device m_device;
-	std::default_random_engine m_engine;
 public:
 	Random(const Random&) = delete;
 

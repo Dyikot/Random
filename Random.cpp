@@ -2,7 +2,7 @@
 
 Random::Random()
 {
-    m_engine.seed(m_device());
+    _engine.seed(_device());
 }
 
 Random& Random::Current()
@@ -14,5 +14,5 @@ Random& Random::Current()
 int Random::NextInt(int min, int max)
 {
     std::uniform_int_distribution<int> range(min, max);
-    return range(m_engine);
+    return range(_engine);
 }
