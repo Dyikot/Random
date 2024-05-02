@@ -11,7 +11,7 @@ Random& Random::Current()
     return instance;
 }
 
-int Random::GenerateNumber(int min, int max)
+int Random::NextInt(int min, int max)
 {
     std::uniform_int_distribution<int> range(min, max);
     return range(m_engine);
