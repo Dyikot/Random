@@ -29,7 +29,7 @@ public:
 	}
 
 	template<Numeric Numeric>
-	std::vector<Numeric> GenerateVector(const int min, const int max, const size_t size) const
+	std::vector<Numeric> GenerateVector(const int min, const int max, const size_t size)
 	{
 		std::vector<Numeric> range(size);
 
