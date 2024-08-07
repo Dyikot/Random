@@ -24,7 +24,7 @@ public:
 
 	int NextInt(const int min, const int max)
 	{
-		_distribution.param(std::uniform_int<>::param_type(min, max));
+		_distribution.param(std::uniform_int_distribution<>::param_type(min, max));
 		return _distribution(_engine);
 	}
 
