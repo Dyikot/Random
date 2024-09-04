@@ -69,4 +69,15 @@ public:
 			item = NextInt(min, max);
 		}
 	}
+
+	/// <summary>
+	/// Reorders the elements in the given range such
+	/// that each possible permutation of those elements has equal probability of appearance.
+	/// </summary>
+	/// <param name="range"> - 	the range of elements to shuffle randomly</param>
+	template<std::ranges::range Range>
+	void Shuffle(Range& range) noexcept
+	{
+		std::ranges::shuffle(range, _engine);
+	}
 };
