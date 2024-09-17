@@ -71,39 +71,47 @@ public:
 	{
 		NextDouble(0, 1);
 	}
-	
-	/// <summary>
-	/// Generate std::vector&lt;Numeric&gt; in a range [min, max]
-	/// </summary>
-	/// <param name="min"> - minimal value</param>
-	/// <param name="max"> - maximum value</param>
-	/// <param name="size"> - length of vector</param>
-	/// <returns>a vector with random numbers in a range [min, max]</returns>
-	template<Numeric Numeric>
-	std::vector<Numeric> GenerateVector(int min, int max, size_t size) noexcept
-	{
-		std::vector<Numeric> range(size);
-
-		for(auto& item : range)
-		{
-			item = NextInt(min, max);
-		}
-
-		return range;
-	}
 
 	/// <summary>
-	/// Fill a numeric range with random numbers in a range [min, max]
+	/// Fill a numeric range with random int numbers in a range [min, max]
 	/// </summary>
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
 	template<NumericRange NumericRange>
-	void FillRange(NumericRange& range, int min, int max) noexcept
+	void Fill(NumericRange& range, int min, int max) noexcept
 	{
 		for(auto& item : range)
 		{
 			item = NextInt(min, max);
+		}
+	}
+
+	/// <summary>
+	/// Fill a numeric range with random double numbers in a range [min, max]
+	/// </summary>
+	/// <param name="range"> - numeric range</param>
+	/// <param name="min"> - minimal value</param>
+	/// <param name="max"> - maximum value</param>
+	template<NumericRange NumericRange>
+	void Fill(NumericRange& range, double min, double max) noexcept
+	{
+		for(auto& item : range)
+		{
+			item = NextDouble(min, max);
+		}
+	}
+
+	/// <summary>
+	/// Fill a numeric range with random double numbers in a range [0, 1]
+	/// </summary>
+	/// <param name="range"> - numeric range</param>
+	template<NumericRange NumericRange>
+	void Fill(NumericRange& range) noexcept
+	{
+		for(auto& item : range)
+		{
+			item = NextDouble();
 		}
 	}
 
