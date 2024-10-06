@@ -78,8 +78,8 @@ public:
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
-	template<NumericRange NumericRange>
-	void Fill(NumericRange& range, int min, int max) noexcept
+	template<NumericRange R>
+	void Fill(R& range, int min, int max) noexcept
 	{
 		for(auto& item : range)
 		{
@@ -93,8 +93,8 @@ public:
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
-	template<NumericRange NumericRange>
-	void Fill(NumericRange& range, double min, double max) noexcept
+	template<NumericRange R>
+	void Fill(R& range, double min, double max) noexcept
 	{
 		for(auto& item : range)
 		{
@@ -106,8 +106,8 @@ public:
 	/// Fill a numeric range with random double numbers in a range [0, 1]
 	/// </summary>
 	/// <param name="range"> - numeric range</param>
-	template<NumericRange NumericRange>
-	void Fill(NumericRange& range) noexcept
+	template<NumericRange R>
+	void Fill(R& range) noexcept
 	{
 		for(auto& item : range)
 		{
@@ -120,8 +120,8 @@ public:
 	/// that each possible permutation of those elements has equal probability of appearance.
 	/// </summary>
 	/// <param name="range"> - 	the range of elements to shuffle randomly</param>
-	template<std::ranges::range Range>
-	void Shuffle(Range& range) noexcept
+	template<std::ranges::range R>
+	void Shuffle(R& range) noexcept
 	{
 		std::ranges::shuffle(range, _engine);
 	}
