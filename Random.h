@@ -79,7 +79,7 @@ public:
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
 	template<NumericRange R>
-	void Fill(R& range, int min, int max) noexcept
+	void Fill(R&& range, int min, int max) noexcept
 	{
 		for(auto& item : range)
 		{
@@ -94,7 +94,7 @@ public:
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
 	template<NumericRange R>
-	void Fill(R& range, double min, double max) noexcept
+	void Fill(R&& range, double min, double max) noexcept
 	{
 		for(auto& item : range)
 		{
@@ -107,7 +107,7 @@ public:
 	/// </summary>
 	/// <param name="range"> - numeric range</param>
 	template<NumericRange R>
-	void Fill(R& range) noexcept
+	void Fill(R&& range) noexcept
 	{
 		for(auto& item : range)
 		{
@@ -121,7 +121,7 @@ public:
 	/// </summary>
 	/// <param name="range"> - 	the range of elements to shuffle randomly</param>
 	template<std::ranges::range R>
-	void Shuffle(R& range) noexcept
+	void Shuffle(R&& range) noexcept
 	{
 		std::ranges::shuffle(range, _engine);
 	}
