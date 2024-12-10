@@ -3,6 +3,7 @@
 #include <random>
 #include <ranges>
 #include <concepts>
+#include <mutex>
 
 template<typename T>
 concept Numeric = std::convertible_to<T, int>;
@@ -13,18 +14,19 @@ concept NumericRange = std::ranges::range<T> && Numeric<std::ranges::range_value
 class Random
 {
 private:
+	static inline std::mutex _mutex = {};
+	static inline std::default_random_engine _engine = {};
 	std::random_device _device;
-	std::default_random_engine _engine;
-	std::uniform_int_distribution<> _intDistribution;
-	std::uniform_real_distribution<> _realDistribution;
 public:
 	Random() noexcept
 	{
+		std::lock_guard<std::mutex> lock(_mutex);
 		_engine.seed(_device());
 	}
 
 	Random(uint32_t seed) noexcept
 	{
+		std::lock_guard<std::mutex> lock(_mutex);
 		_engine.seed(seed);
 	}
 
@@ -35,8 +37,8 @@ public:
 	/// <returns>a random uint32 number in a range [0, max]</returns>
 	uint32_t Next(uint32_t max) noexcept
 	{
-		_intDistribution.param(std::uniform_int_distribution<>::param_type(0, max));
-		return _intDistribution(_engine);
+		std::lock_guard<std::mutex> lock(_mutex);
+		return std::uniform_int_distribution<>(0, max)(_engine);
 	}
 
 	/// <summary>
@@ -47,8 +49,8 @@ public:
 	/// <returns>a random number in a range [min, max]</returns>
 	int NextInt(int min, int max) noexcept
 	{
-		_intDistribution.param(std::uniform_int_distribution<>::param_type(min, max));
-		return _intDistribution(_engine);
+		std::lock_guard<std::mutex> lock(_mutex);
+		return std::uniform_int_distribution<>(min, max)(_engine);
 	}
 
 	/// <summary>
@@ -59,8 +61,8 @@ public:
 	/// <returns>a random real number in a range [min, max]</returns>
 	double NextDouble(double min, double max) noexcept
 	{
-		_realDistribution.param(std::uniform_real_distribution<>::param_type(min, max));
-		return _realDistribution(_engine);
+		std::lock_guard<std::mutex> lock(_mutex);
+		return std::uniform_real_distribution<>(min, max)(_engine);
 	}
 
 	/// <summary>
@@ -81,9 +83,10 @@ public:
 	template<typename TRange> requires NumericRange<TRange>
 	void Fill(TRange&& range, int min, int max) noexcept
 	{
+		std::lock_guard<std::mutex> lock(_mutex);
 		for(auto& item : range)
 		{
-			item = NextInt(min, max);
+			item = std::uniform_int_distribution<>(min, max)(_engine);
 		}
 	}
 
@@ -96,9 +99,10 @@ public:
 	template<typename TRange> requires NumericRange<TRange>
 	void Fill(TRange&& range, double min, double max) noexcept
 	{
+		std::lock_guard<std::mutex> lock(_mutex);
 		for(auto& item : range)
 		{
-			item = NextDouble(min, max);
+			item = std::uniform_real_distribution<>(min, max)(_engine);
 		}
 	}
 
@@ -109,9 +113,10 @@ public:
 	template<typename TRange> requires NumericRange<TRange>
 	void Fill(TRange&& range) noexcept
 	{
+		std::lock_guard<std::mutex> lock(_mutex);
 		for(auto& item : range)
 		{
-			item = NextDouble();
+			item = std::uniform_real_distribution<>(0, 1)(_engine);
 		}
 	}
 
@@ -123,6 +128,7 @@ public:
 	template<typename TRange> requires std::ranges::range<TRange>
 	void Shuffle(TRange&& range) noexcept
 	{
+		std::lock_guard<std::mutex> lock(_mutex);
 		std::ranges::shuffle(std::forward<TRange>(range), _engine);
 	}
 };
