@@ -14,8 +14,8 @@ concept NumericRange = std::ranges::range<T> && Numeric<std::ranges::range_value
 class Random
 {
 private:
-	static inline std::mutex _mutex = {};
-	static inline std::default_random_engine _engine = {};
+	static inline std::mutex _mutex;
+	static inline std::default_random_engine _engine;
 	std::random_device _device;
 public:
 	Random() noexcept
