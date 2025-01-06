@@ -4,12 +4,12 @@
 #include <ranges>
 #include <concepts>
 #include <mutex>
+#include <type_traits>
 
-template<typename T>
-concept Numeric = std::convertible_to<T, int>;
 
-template<typename T>
-concept NumericRange = std::ranges::range<T> && Numeric<std::ranges::range_value_t<T>>;
+template<typename TRange>
+concept IsArithmeticRange = std::ranges::range<TRange> &&
+							std::is_arithmetic_v<std::ranges::range_value_t<TRange>>;
 
 class Random
 {
@@ -22,17 +22,17 @@ public:
 		_engine.seed(_device());
 	}
 
-	Random(uint32_t seed) noexcept
+	Random(unsigned int seed) noexcept
 	{
 		_engine.seed(seed);
 	}
 
 	/// <summary>
-	/// Generate a random uint32 number in a range [0, max]
+	/// Generate a random unsigned int number in a range [0, max]
 	/// </summary>
 	/// <param name="max"> - maximum value</param>
-	/// <returns>a random uint32 number in a range [0, max]</returns>
-	uint32_t Next(uint32_t max) noexcept
+	/// <returns>a random unsigned int number in a range [0, max]</returns>
+	unsigned int Next(unsigned int max) noexcept
 	{
 		return std::uniform_int_distribution<>(0, max)(_engine);
 	}
@@ -65,7 +65,7 @@ public:
 	/// <returns>a random real number in a range [0, 1]</returns>
 	double NextDouble() noexcept
 	{
-		NextDouble(0, 1);
+		NextDouble(0.0, 1.0);
 	}
 
 	/// <summary>
@@ -74,7 +74,7 @@ public:
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
-	template<typename TRange> requires NumericRange<TRange>
+	template<typename TRange> requires IsArithmeticRange<TRange>
 	void Fill(TRange&& range, int min, int max) noexcept
 	{
 		for(auto& item : range)
@@ -89,7 +89,7 @@ public:
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
-	template<typename TRange> requires NumericRange<TRange>
+	template<typename TRange> requires IsArithmeticRange<TRange>
 	void Fill(TRange&& range, double min, double max) noexcept
 	{
 		for(auto& item : range)
@@ -102,7 +102,7 @@ public:
 	/// Fill a numeric range with random double numbers in a range [0, 1]
 	/// </summary>
 	/// <param name="range"> - numeric range</param>
-	template<typename TRange> requires NumericRange<TRange>
+	template<typename TRange> requires IsArithmeticRange<TRange>
 	void Fill(TRange&& range) noexcept
 	{
 		for(auto& item : range)
@@ -116,7 +116,7 @@ public:
 	/// that each possible permutation of those elements has equal probability of appearance.
 	/// </summary>
 	/// <param name="range"> - 	the range of elements to shuffle randomly</param>
-	template<typename TRange> requires std::ranges::range<TRange>
+	template<typename TRange> requires std::ranges::random_access_range<TRange>
 	void Shuffle(TRange&& range) noexcept
 	{
 		std::ranges::shuffle(std::forward<TRange>(range), _engine);
@@ -132,7 +132,7 @@ public:
 		Random()
 	{}
 
-	SharedRandom(uint32_t seed) noexcept:
+	SharedRandom(unsigned int seed) noexcept:
 		Random(seed)
 	{}
 
@@ -141,7 +141,7 @@ public:
 	/// </summary>
 	/// <param name="max"> - maximum value</param>
 	/// <returns>a random uint32 number in a range [0, max]</returns>
-	uint32_t Next(uint32_t max) noexcept
+	unsigned int Next(unsigned int max) noexcept
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 		return Random::Next(max);
@@ -177,7 +177,7 @@ public:
 	/// <returns>a random real number in a range [0, 1]</returns>
 	double NextDouble() noexcept
 	{
-		Random::NextDouble(0, 1);
+		Random::NextDouble(0.0, 1.0);
 	}
 
 	/// <summary>
@@ -186,7 +186,7 @@ public:
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
-	template<typename TRange> requires NumericRange<TRange>
+	template<typename TRange> requires IsArithmeticRange<TRange>
 	void Fill(TRange&& range, int min, int max) noexcept
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
@@ -199,7 +199,7 @@ public:
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
-	template<typename TRange> requires NumericRange<TRange>
+	template<typename TRange> requires IsArithmeticRange<TRange>
 	void Fill(TRange&& range, double min, double max) noexcept
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
@@ -210,7 +210,7 @@ public:
 	/// Fill a numeric range with random double numbers in a range [0, 1]
 	/// </summary>
 	/// <param name="range"> - numeric range</param>
-	template<typename TRange> requires NumericRange<TRange>
+	template<typename TRange> requires IsArithmeticRange<TRange>
 	void Fill(TRange&& range) noexcept
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
@@ -222,7 +222,7 @@ public:
 	/// that each possible permutation of those elements has equal probability of appearance.
 	/// </summary>
 	/// <param name="range"> - 	the range of elements to shuffle randomly</param>
-	template<typename TRange> requires std::ranges::range<TRange>
+	template<typename TRange> requires std::ranges::random_access_range<TRange>
 	void Shuffle(TRange&& range) noexcept
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
