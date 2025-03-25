@@ -8,8 +8,8 @@
 
 
 template<typename TRange>
-concept IsArithmeticRange = std::ranges::range<TRange> &&
-							std::is_arithmetic_v<std::ranges::range_value_t<TRange>>;
+concept ArithmeticRange = std::ranges::range<TRange> &&
+						  std::is_arithmetic_v<std::ranges::range_value_t<TRange>>;
 
 class Random
 {
@@ -74,8 +74,7 @@ public:
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
-	template<typename TRange> requires IsArithmeticRange<TRange>
-	void Fill(TRange&& range, int min, int max) noexcept
+	void Fill(ArithmeticRange auto&& range, int min, int max) noexcept
 	{
 		for(auto& item : range)
 		{
@@ -89,8 +88,7 @@ public:
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
-	template<typename TRange> requires IsArithmeticRange<TRange>
-	void Fill(TRange&& range, double min, double max) noexcept
+	void Fill(ArithmeticRange auto&& range, double min, double max) noexcept
 	{
 		for(auto& item : range)
 		{
@@ -102,8 +100,7 @@ public:
 	/// Fill a numeric range with random double numbers in a range [0, 1]
 	/// </summary>
 	/// <param name="range"> - numeric range</param>
-	template<typename TRange> requires IsArithmeticRange<TRange>
-	void Fill(TRange&& range) noexcept
+	void Fill(ArithmeticRange auto&& range) noexcept
 	{
 		for(auto& item : range)
 		{
@@ -116,10 +113,9 @@ public:
 	/// that each possible permutation of those elements has equal probability of appearance.
 	/// </summary>
 	/// <param name="range"> - 	the range of elements to shuffle randomly</param>
-	template<typename TRange> requires std::ranges::random_access_range<TRange>
-	void Shuffle(TRange&& range) noexcept
+	void Shuffle(std::ranges::random_access_range auto&& range) noexcept
 	{
-		std::ranges::shuffle(std::forward<TRange>(range), _engine);
+		std::ranges::shuffle(std::forward<decltype(range)>(range), _engine);
 	}
 };
 
@@ -186,11 +182,10 @@ public:
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
-	template<typename TRange> requires IsArithmeticRange<TRange>
-	void Fill(TRange&& range, int min, int max) noexcept
+	void Fill(ArithmeticRange auto&& range, int min, int max) noexcept
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
-		Random::Fill(std::forward<TRange>(range), min, max);
+		Random::Fill(std::forward<decltype(range)>(range), min, max);
 	}
 
 	/// <summary>
@@ -199,22 +194,20 @@ public:
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
-	template<typename TRange> requires IsArithmeticRange<TRange>
-	void Fill(TRange&& range, double min, double max) noexcept
+	void Fill(ArithmeticRange auto&& range, double min, double max) noexcept
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
-		Random::Fill(std::forward<TRange>(range), min, max);
+		Random::Fill(std::forward<decltype(range)>(range), min, max);
 	}
 
 	/// <summary>
 	/// Fill a numeric range with random double numbers in a range [0, 1]
 	/// </summary>
 	/// <param name="range"> - numeric range</param>
-	template<typename TRange> requires IsArithmeticRange<TRange>
-	void Fill(TRange&& range) noexcept
+	void Fill(ArithmeticRange auto&& range) noexcept
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
-		Random::Fill(std::forward<TRange>(range));
+		Random::Fill(std::forward<decltype(range)>(range));
 	}
 
 	/// <summary>
@@ -222,10 +215,9 @@ public:
 	/// that each possible permutation of those elements has equal probability of appearance.
 	/// </summary>
 	/// <param name="range"> - 	the range of elements to shuffle randomly</param>
-	template<typename TRange> requires std::ranges::random_access_range<TRange>
-	void Shuffle(TRange&& range) noexcept
+	void Shuffle(std::ranges::random_access_range auto&& range) noexcept
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
-		Random::Shuffle(std::forward<TRange>(range));
+		Random::Shuffle(std::forward<decltype(range)>(range));
 	}
 };
