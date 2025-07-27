@@ -1,13 +1,10 @@
 ## About
 **"Random"** is a modern, header-only C++20 library that simplifies random number generation with a clean, intuitive interface. It leverages C++20 features like concepts, ranges, and uniform distribution to provide type-safe, efficient random operations.
 
-The library provides two main classes:
-- `Random`: Basic random number generation with range operations
-- `SharedRandom`: Thread-safe version with mutex protection
 ## Key Features
 - **C++20 Concepts**: Type-safe range operations with `ArithmeticRange` concept
 - **Range Support**: Fill and shuffle standard containers (`std::vector`, `std::array`, etc.)
-- **Thread Safety**: `SharedRandom` class provides thread-safe operations
+- **Thread Safety**: Thread-local storage provides automatic thread isolation (no locking overhead)
 - **Uniform Distributions**: 
   - Integer distributions (`Next`, `NextInt`)
   - Floating point distributions (`NextDouble`)
