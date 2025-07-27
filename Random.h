@@ -3,12 +3,10 @@
 #include <random>
 #include <ranges>
 #include <concepts>
-#include <mutex>
-#include <type_traits>
-
+#include <array>
 
 template<typename TRange>
-concept ArithmeticRange = std::ranges::range<TRange> &&
+concept ArithmeticRange = std::ranges::range<TRange> && 
 						  std::is_arithmetic_v<std::ranges::range_value_t<TRange>>;
 
 class Random
@@ -75,7 +73,8 @@ public:
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
-	void Fill(ArithmeticRange auto&& range, int min, int max) noexcept
+	template<ArithmeticRange TRange>
+	void Fill(TRange&& range, int min, int max) noexcept
 	{
 		auto& engine = GetEngine();
 		for(auto& item : range)
@@ -90,7 +89,8 @@ public:
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
-	void Fill(ArithmeticRange auto&& range, double min, double max) noexcept
+	template<ArithmeticRange TRange>
+	void Fill(TRange&& range, double min, double max) noexcept
 	{
 		auto& engine = GetEngine();
 		for(auto& item : range)
@@ -103,7 +103,8 @@ public:
 	/// Fill a numeric range with random double numbers in a range [0, 1]
 	/// </summary>
 	/// <param name="range"> - numeric range</param>
-	void Fill(ArithmeticRange auto&& range) noexcept
+	template<ArithmeticRange TRange>
+	void Fill(TRange&& range) noexcept
 	{
 		auto& engine = GetEngine();
 		for(auto& item : range)
@@ -117,9 +118,63 @@ public:
 	/// that each possible permutation of those elements has equal probability of appearance.
 	/// </summary>
 	/// <param name="range"> - 	the range of elements to shuffle randomly</param>
-	void Shuffle(std::ranges::random_access_range auto&& range) noexcept
+	template<std::ranges::random_access_range TRange>
+	void Shuffle(TRange&& range) noexcept
 	{
-		std::ranges::shuffle(std::forward<decltype(range)>(range), GetEngine());
+		std::ranges::shuffle(std::forward<TRange>(range), GetEngine());
+	}
+
+	/// <summary>
+	/// Randomly selects a fixed number of items from a range and returns them in an array.
+	/// </summary>
+	/// <param name="choises"> - the range to select items from</param>
+	/// <returns>An array containing Length randomly selected items from the input range</returns>
+	template<size_t Length, std::ranges::random_access_range TRange,
+		typename T = std::ranges::range_value_t<TRange>>
+		std::array<T, Length> GetItems(TRange&& choises)
+	{
+		const size_t length = std::ranges::size(choises);
+		std::array<T, Length> array;
+
+		if(length == 0)
+		{
+			return array;
+		}
+
+		const size_t last = length - 1;
+		for(size_t i = 0; i < Length; i++)
+		{
+			array[i] = choises[Next(last)];
+		}
+
+		return array;
+	}
+
+	/// <summary>
+	/// Randomly selects items from a source range and fills a destination range with them. Both ranges must contain the same type of elements.
+	/// </summary>
+	/// <param name="choises"> - the source range to select items from</param>
+	/// <param name="destination"> - the destination range to fill with selected items</param>
+	template<std::ranges::random_access_range TChoisesRange,
+		std::ranges::random_access_range TDestinationRange>
+		requires std::same_as<std::ranges::range_value_t<TChoisesRange>,
+	std::ranges::range_value_t<TDestinationRange>>
+		void GetItems(TChoisesRange&& choises, TDestinationRange& destination)
+	{
+		const size_t choisesLength = std::ranges::size(choises);
+		const size_t destinationLength = std::ranges::size(destination);
+
+		if(choisesLength == 0 || destinationLength == 0)
+		{
+			return;
+		}
+
+		const size_t last = choisesLength - 1;
+
+		for(size_t i = 0; i < destinationLength; i++)
+		{
+			destination[i] = choises[Next(last)];
+		}
 	}
 private:
 	Engine& GetEngine()
