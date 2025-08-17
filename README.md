@@ -14,7 +14,8 @@
 ```
 #include "Random.h"
 
-int main() {
+int main()
+{
     Random random;  // Create with random seed
     
     // Generate random integers
@@ -32,5 +33,14 @@ int main() {
     // Shuffle a container
     std::vector<int> numbers = {1, 2, 3, 4, 5};
     random.Shuffle(numbers);
+
+    std::array<std::string, 4> choises = { "Anna", "Jane", "Felix", "Max" };
+    // Get random item from choises
+    auto name = random.GetItem(choises);
+    // Get random items from choises 
+    auto names = random.GetItems<2>(choises);
+    // Get random items and add them to destination range
+    std::vector<std::string> destinaton(4);
+    random.GetItems(choises, destinaton);
 }
 ```
