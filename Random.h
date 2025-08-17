@@ -125,23 +125,40 @@ public:
 	}
 
 	/// <summary>
+	/// Randomly selects an item from a range.
+	/// </summary>
+	/// <param name="choises"> - the range to select items from</param>
+	/// <returns>A random selected item from the input range</returns>
+	template<std::ranges::random_access_range TRange, typename T = std::ranges::range_value_t<TRange>>
+	T GetItem(TRange&& choises)
+	{
+		const size_t length = std::ranges::size(choises);
+		if(length == 0)
+		{
+			throw std::invalid_argument("Choises range cannot be empty");
+		}
+		
+		return choises[Next(length - 1)];
+	}
+
+	/// <summary>
 	/// Randomly selects a fixed number of items from a range and returns them in an array.
 	/// </summary>
 	/// <param name="choises"> - the range to select items from</param>
 	/// <returns>An array containing Length randomly selected items from the input range</returns>
 	template<size_t Length, std::ranges::random_access_range TRange,
-		typename T = std::ranges::range_value_t<TRange>>
-		std::array<T, Length> GetItems(TRange&& choises)
+			 typename T = std::ranges::range_value_t<TRange>>
+	std::array<T, Length> GetItems(TRange&& choises)
 	{
 		const size_t length = std::ranges::size(choises);
-		std::array<T, Length> array;
 
 		if(length == 0)
 		{
-			return array;
+			throw std::invalid_argument("Choises range cannot be empty");;
 		}
 
 		const size_t last = length - 1;
+		std::array<T, Length> array;
 		for(size_t i = 0; i < Length; i++)
 		{
 			array[i] = choises[Next(last)];
@@ -155,22 +172,25 @@ public:
 	/// </summary>
 	/// <param name="choises"> - the source range to select items from</param>
 	/// <param name="destination"> - the destination range to fill with selected items</param>
-	template<std::ranges::random_access_range TChoisesRange,
-		std::ranges::random_access_range TDestinationRange>
+	template<std::ranges::random_access_range TChoisesRange, std::ranges::random_access_range TDestinationRange>
 		requires std::same_as<std::ranges::range_value_t<TChoisesRange>,
-	std::ranges::range_value_t<TDestinationRange>>
-		void GetItems(TChoisesRange&& choises, TDestinationRange& destination)
+							  std::ranges::range_value_t<TDestinationRange>>
+	void GetItems(TChoisesRange&& choises, TDestinationRange& destination)
 	{
 		const size_t choisesLength = std::ranges::size(choises);
 		const size_t destinationLength = std::ranges::size(destination);
 
-		if(choisesLength == 0 || destinationLength == 0)
+		if(choisesLength == 0)
 		{
-			return;
+			throw std::invalid_argument("Choises range cannot be empty");
+		}
+
+		if(destinationLength == 0)
+		{
+			throw std::invalid_argument("Destination range cannot be empty");
 		}
 
 		const size_t last = choisesLength - 1;
-
 		for(size_t i = 0; i < destinationLength; i++)
 		{
 			destination[i] = choises[Next(last)];
