@@ -31,7 +31,7 @@ public:
 	/// </summary>
 	/// <param name="max"> - maximum value</param>
 	/// <returns>a random unsigned int number in a range [0, max]</returns>
-	unsigned int Next(unsigned int max) noexcept
+	unsigned int Next(unsigned int max) const noexcept
 	{
 		return IntDistribution(0, max)(GetEngine());
 	}
@@ -42,7 +42,7 @@ public:
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
 	/// <returns>a random number in a range [min, max]</returns>
-	int NextInt(int min, int max) noexcept
+	int NextInt(int min, int max) const noexcept
 	{
 		return IntDistribution(min, max)(GetEngine());
 	}
@@ -53,7 +53,7 @@ public:
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
 	/// <returns>a random real number in a range [min, max]</returns>
-	double NextDouble(double min, double max) noexcept
+	double NextDouble(double min, double max) const noexcept
 	{
 		return RealDistribution(min, max)(GetEngine());
 	}
@@ -62,7 +62,7 @@ public:
 	/// Generate a random real number in a range [0, 1]
 	/// </summary>
 	/// <returns>a random real number in a range [0, 1]</returns>
-	double NextDouble() noexcept
+	double NextDouble() const noexcept
 	{
 		return NextDouble(0.0, 1.0);
 	}
@@ -74,7 +74,7 @@ public:
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
 	template<ArithmeticRange TRange>
-	void Fill(TRange&& range, int min, int max) noexcept
+	void Fill(TRange&& range, int min, int max) const noexcept
 	{
 		auto& engine = GetEngine();
 		for(auto& item : range)
@@ -90,7 +90,7 @@ public:
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
 	template<ArithmeticRange TRange>
-	void Fill(TRange&& range, double min, double max) noexcept
+	void Fill(TRange&& range, double min, double max) const noexcept
 	{
 		auto& engine = GetEngine();
 		for(auto& item : range)
@@ -104,7 +104,7 @@ public:
 	/// </summary>
 	/// <param name="range"> - numeric range</param>
 	template<ArithmeticRange TRange>
-	void Fill(TRange&& range) noexcept
+	void Fill(TRange&& range) const noexcept
 	{
 		auto& engine = GetEngine();
 		for(auto& item : range)
@@ -119,7 +119,7 @@ public:
 	/// </summary>
 	/// <param name="range"> - 	the range of elements to shuffle randomly</param>
 	template<std::ranges::random_access_range TRange>
-	void Shuffle(TRange&& range) noexcept
+	void Shuffle(TRange&& range) const noexcept
 	{
 		std::ranges::shuffle(std::forward<TRange>(range), GetEngine());
 	}
@@ -130,7 +130,7 @@ public:
 	/// <param name="choises"> - the range to select items from</param>
 	/// <returns>A random selected item from the input range</returns>
 	template<std::ranges::random_access_range TRange, typename T = std::ranges::range_value_t<TRange>>
-	T GetItem(TRange&& choises)
+	T GetItem(TRange&& choises) const
 	{
 		const size_t length = std::ranges::size(choises);
 		if(length == 0)
@@ -148,7 +148,7 @@ public:
 	/// <returns>An array containing Length randomly selected items from the input range</returns>
 	template<size_t Length, std::ranges::random_access_range TRange,
 			 typename T = std::ranges::range_value_t<TRange>>
-	std::array<T, Length> GetItems(TRange&& choises)
+	std::array<T, Length> GetItems(TRange&& choises) const
 	{
 		const size_t length = std::ranges::size(choises);
 
@@ -175,7 +175,7 @@ public:
 	template<std::ranges::random_access_range TChoisesRange, std::ranges::random_access_range TDestinationRange>
 		requires std::same_as<std::ranges::range_value_t<TChoisesRange>,
 							  std::ranges::range_value_t<TDestinationRange>>
-	void GetItems(TChoisesRange&& choises, TDestinationRange& destination)
+	void GetItems(TChoisesRange&& choises, TDestinationRange& destination) const
 	{
 		const size_t choisesLength = std::ranges::size(choises);
 		const size_t destinationLength = std::ranges::size(destination);
@@ -197,7 +197,7 @@ public:
 		}
 	}
 private:
-	Engine& GetEngine()
+	Engine& GetEngine() const noexcept
 	{
 		thread_local Engine engine;
 		return engine;
