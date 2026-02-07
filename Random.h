@@ -4,11 +4,19 @@
 #include <ranges>
 #include <concepts>
 #include <array>
+#include <vector>
 
 template<typename TRange>
-concept ArithmeticRange = std::ranges::range<TRange> && 
-						  std::is_arithmetic_v<std::ranges::range_value_t<TRange>>;
+concept CArithmeticRange = std::ranges::range<TRange> &&
+						   std::is_arithmetic_v<std::ranges::range_value_t<TRange>>;
 
+/// <summary>
+/// Provides various random number generation utilities.
+/// Includes methods for generating random numbers in ranges, filling containers with random values,
+/// shuffling ranges, and selecting random items from collections.
+/// Uses std::mt19937 as the underlying random number engine.
+/// Each thread has its own engine instance.
+/// </summary>
 class Random
 {
 private:
@@ -77,7 +85,7 @@ public:
 	/// <param name="range"> - numeric range</param>
 	/// <param name="min"> - minimal value</param>
 	/// <param name="max"> - maximum value</param>
-	template<ArithmeticRange TRange, typename T = std::ranges::range_value_t<TRange>>
+	template<CArithmeticRange TRange, typename T = std::ranges::range_value_t<TRange>>
 	void Fill(TRange& range, T min, T max) const noexcept
 	{
 		using Distribution = std::conditional_t<
@@ -152,6 +160,37 @@ public:
 	}
 
 	/// <summary>
+	/// Randomly selects a variable number of items from a range and returns them in a vector.
+	/// </summary>
+	/// <param name="choises"> - the range to select items from</param>
+	/// <param name="count"> - the number of items to select</param>
+	/// <returns>A vector containing count randomly selected items from the input range</returns>
+	template<std::ranges::random_access_range TRange,
+			 typename T = std::ranges::range_value_t<TRange>>
+	std::vector<T> GetItems(TRange&& choises, size_t count) const
+	{
+		const size_t length = std::ranges::size(choises);
+
+		if(length == 0)
+		{
+			throw std::invalid_argument("Choises range cannot be empty");
+		}
+
+		std::vector<T> result;
+		result.reserve(count);
+		const size_t last = length - 1;
+		auto& engine = GetEngine();
+		std::uniform_int_distribution<size_t> dist(0, last);
+
+		for(size_t i = 0; i < count; i++)
+		{
+			result.push_back(choises[dist(engine)]);
+		}
+
+		return result;
+	}
+
+	/// <summary>
 	/// Randomly selects items from a source range and fills a destination range with them. Both ranges must contain the same type of elements.
 	/// </summary>
 	/// <param name="choises"> - the source range to select items from</param>
@@ -182,6 +221,23 @@ public:
 		{
 			destination[i] = choises[dist(engine)];
 		}
+	}
+
+	/// <summary>
+	/// Generates a vector of random numbers in a range [min, max] with specified count.
+	/// Parameter order: min, max, count
+	/// </summary>
+	/// <param name="min"> - minimal value</param>
+	/// <param name="max"> - maximum value</param>
+	/// <param name="count"> - the number of random values to generate</param>
+	/// <returns>A vector containing count random numbers in the range [min, max]</returns>
+	template<typename T>
+	std::vector<T> RandomVector(T min, T max, size_t count) const noexcept 
+		requires std::is_arithmetic_v<T>
+	{
+		std::vector<T> result(count);
+		Fill(result, min, max);
+		return result;
 	}
 private:
 	Engine& GetEngine() const noexcept
